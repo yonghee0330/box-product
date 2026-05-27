@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>비박스 셀러 판매물품 등록</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f4ef;
+    --surface: #ffffff;
+    --ink: #1a1814;
+    --muted: #7a756c;
+    --accent: #2d5a3d;
+    --accent-light: #e8f0eb;
+    --border: #ddd8d0;
+    --error: #c0392b;
+    --success: #2d5a3d;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 16px 80px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .header {
+    margin-bottom: 40px;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 4px 10px;
+    border-radius: 2px;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+
+  .subtitle {
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 32px 28px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+
+  .field {
+    margin-bottom: 22px;
+  }
+
+  label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 7px;
+    text-transform: uppercase;
+  }
+
+  label span {
+    color: var(--accent);
+  }
+
+  input[type="text"],
+  input[type="number"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-size: 15px;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(45, 90, 61, 0.1);
+    background: #fff;
+  }
+
+  input::placeholder {
+    color: #bbb;
+  }
+
+  .price-wrap {
+    position: relative;
+  }
+
+  .price-wrap input {
+    padding-right: 36px;
+  }
+
+  .price-unit {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 15px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: background 0.15s, transform 0.1s;
+    margin-top: 8px;
+  }
+
+  .btn:hover { background: #234a31; }
+  .btn:active { transform: scale(0.99); }
+  .btn:disabled { background: #aaa; cursor: not-allowed; }
+
+  /* Toast */
+  .toast {
+    display: none;
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 100;
+    white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+  }
+  .toast.success { background: var(--success); }
+  .toast.error { background: var(--error); }
+  .toast.show { display: block; animation: fadeup 0.25s ease; }
+
+  @keyframes fadeup {
+    from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
+  /* List table */
+  .list-section {
+    margin-top: 36px;
+  }
+
+  .list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .list-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .count-badge {
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--accent-light);
+    padding: 3px 9px;
+    border-radius: 20px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 13.5px;
+  }
+
+  thead tr {
+    background: var(--accent-light);
+  }
+
+  th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  td {
+    padding: 11px 14px;
+    border-top: 1px solid var(--border);
+    color: var(--ink);
+  }
+
+  tr:nth-child(even) td { background: #fafaf8; }
+
+  .empty {
+    text-align: center;
+    padding: 28px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .note {
+    margin-top: 20px;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.7;
+  }
+
+  .note a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .note a:hover {
+    text-decoration: underline;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="tag">BeBox Market</div>
+    <h1>비박스 셀러<br>판매물품 등록</h1>
+    <p class="subtitle">판매하실 물품 정보를 입력해 주세요.<br>금요일까지 등록된 상품은 포스에 등록됩니다.</p>
+  </div>
+
+  <div class="card">
+    <div class="field">
+      <label>점주명 <span>*</span></label>
+      <input type="text" id="seller" placeholder="예) 책방 달빛" />
+    </div>
+    <div class="field">
+      <label>상품명 / 제목 <span>*</span></label>
+      <input type="text" id="title" placeholder="예) 비박스 균일가 도서 / 손뜨개 키링" />
+    </div>
+    <div class="field">
+      <label>판매가 <span>*</span></label>
+      <div class="price-wrap">
+        <input type="number" id="price" placeholder="3000" min="0" step="100" />
+        <span class="price-unit">원</span>
+      </div>
+    </div>
+    <button class="btn" onclick="submitForm()" id="submitBtn">등록하기</button>
+  </div>
+
+  <div class="list-section">
+    <div class="list-header">
+      <span class="list-title">등록 목록</span>
+      <span class="count-badge" id="countBadge">0건</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>점주명</th>
+          <th>상품명</th>
+          <th>판매가</th>
+        </tr>
+      </thead>
+      <tbody id="listBody">
+        <tr><td colspan="3" class="empty">아직 등록된 항목이 없습니다.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="note">
+    입력하신 정보는 비북스 운영팀에서만 확인합니다.<br>
+    문의: 비북스 담당자 호세 <a href="tel:01041226242">010-4122-6242</a>
+  </p>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ★ 여기에 Apps Script 배포 URL 붙여넣기
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwradN00smm66icdRP2VGss1LV7Vc2MRKVnrc6ci_ShrJ1GedgyFNHfb06EHlzR-SQu5g/exec';
+
+  let items = [];
+
+  function showToast(msg, type='success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.className = 'toast', 2500);
+  }
+
+  function renderList() {
+    const tbody = document.getElementById('listBody');
+    document.getElementById('countBadge').textContent = items.length + '건';
+    if (items.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="3" class="empty">아직 등록된 항목이 없습니다.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = items.map(i =>
+      `<tr>
+        <td>${i.seller}</td>
+        <td>${i.title}</td>
+        <td>${Number(i.price).toLocaleString()}원</td>
+      </tr>`
+    ).join('');
+  }
+
+  async function submitForm() {
+    const seller = document.getElementById('seller').value.trim();
+    const title  = document.getElementById('title').value.trim();
+    const price  = document.getElementById('price').value.trim();
+
+    if (!seller || !title || !price) {
+      showToast('모든 항목을 입력해 주세요.', 'error'); return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = '등록 중...';
+
+    const payload = { seller, title, price: parseInt(price) };
+
+    // 로컬 목록에 추가
+    items.push(payload);
+    renderList();
+
+    // 구글 시트로 전송
+    if (SCRIPT_URL) {
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'application/json' }
+        });
+        showToast('등록 완료! 구글 시트에 저장됐습니다.');
+      } catch(e) {
+        showToast('저장 중 오류가 발생했습니다.', 'error');
+      }
+    } else {
+      showToast('등록됐습니다. (시트 미연동 상태)');
+    }
+
+    // 폼 초기화
+    document.getElementById('seller').value = '';
+    document.getElementById('title').value = '';
+    document.getElementById('price').value = '';
+    btn.disabled = false;
+    btn.textContent = '등록하기';
+  }
+</script>
+
+</body>
+</html>
